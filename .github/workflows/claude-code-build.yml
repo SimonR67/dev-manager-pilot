@@ -24,6 +24,9 @@ jobs:
         uses: anthropics/claude-code-action@8251c103ac8c1d761882c86aba1412c7f583c844 # v1.0.213
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_args: |
+            --allowedTools "Bash,Edit,Write,Read,Glob,Grep"
+            --permission-mode acceptEdits
           prompt: |
             Read the approved implementation plan at specs/${{ github.event.inputs.job_id }}/plan.md.
 
