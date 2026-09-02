@@ -52,6 +52,22 @@ test('a page without the shared layout does not render the note', () => {
   assert.equal(countMatches(body(standalone), /<footer\b/g), 0)
 })
 
+test('the note is declared once per page and never nested inside itself', () => {
+  for (const page of pages()) {
+    const markup = body(read(page))
+
+    assert.equal(
+      countMatches(markup, /class="company-note"/g),
+      1,
+      `${page} should declare the company note once, not once per nested layout`,
+    )
+
+    const note = markup.match(/<p[^>]*class="company-note"[^>]*>([\s\S]*?)<\/p>/)
+    assert.ok(note)
+    assert.ok(!note[1].includes('company-note'), 'the note should not wrap another note')
+  }
+})
+
 test('the company note is styled small and muted', () => {
   for (const page of pages()) {
     const rule = read(page).match(/\.company-note\s*\{([^}]*)\}/)
