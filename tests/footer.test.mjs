@@ -1,7 +1,13 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 
+import { readFileSync } from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
 import { body, countMatches, pages, read } from './helpers/pages.mjs'
+
+const fixtures = path.join(path.dirname(fileURLToPath(import.meta.url)), 'fixtures')
 
 test('every page has exactly one shared layout body', () => {
   for (const page of pages()) {
@@ -24,6 +30,26 @@ test('every page renders the company note with the exact company name', () => {
     assert.ok(note, `${page} should render a company note`)
     assert.equal(note[1].trim(), 'Sid Meyer Ressurection')
   }
+})
+
+test('every page using the shared layout renders the note, exactly once', () => {
+  const all = pages()
+  assert.ok(all.length >= 1, 'the site should have at least one page')
+
+  for (const page of all) {
+    assert.equal(
+      countMatches(read(page), /Sid Meyer Ressurection/g),
+      1,
+      `${page} should render the company note exactly once`,
+    )
+  }
+})
+
+test('a page without the shared layout does not render the note', () => {
+  const standalone = readFileSync(path.join(fixtures, 'no-layout.html'), 'utf8')
+
+  assert.ok(!standalone.includes('Sid Meyer Ressurection'))
+  assert.equal(countMatches(body(standalone), /<footer\b/g), 0)
 })
 
 test('the company note is styled small and muted', () => {
