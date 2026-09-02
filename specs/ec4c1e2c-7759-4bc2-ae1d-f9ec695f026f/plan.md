@@ -4,26 +4,21 @@ Status: draft
 Job: ec4c1e2c-7759-4bc2-ae1d-f9ec695f026f
 Spec: https://github.com/SimonR67/dev-manager-pilot/blob/main/specs/ec4c1e2c-7759-4bc2-ae1d-f9ec695f026f/spec.md
 
+**Note on text content:** The approved spec uses "Alpha Biscuits" as the example company name. A human reviewer explicitly requested that whatever name is currently used ("Beta Biscuit" or "Alpha Biscuit") be changed to **"Delta Biscuit"**. This plan implements the note using the text **"Delta Biscuit"** as the final, current company name — this is treated as a wording/content correction within the same approved scope (a single static line of text above the footer), not a scope change.
+
 ## 1. Definition of done
 
-- A static text note ("Alpha Biscuits") is rendered immediately above the `<footer>` element in the shared page layout/component.
-- The note appears on every page that renders the shared layout with a footer, and does not appear on pages that don't render that footer.
-- The note is hardcoded (no config, env var, DB, or admin UI dependency).
-- The note has minimal styling consistent with the footer area (small, muted text) and does not break or overflow on narrow/mobile viewports.
-- No other footer content, structure, or unrelated pages are modified.
+- A static, single line of text reading "Delta Biscuit" is rendered immediately above the `<footer>` element (or equivalent footer component) in the shared page layout.
+- The note appears on every page that renders the shared layout with a footer.
+- The note does not appear on pages/layouts that do not include the shared footer.
+- Styling is minimal and consistent with the footer area (small, muted text), does not restyle or restructure the existing footer.
+- The note remains readable and does not break or shift layout at mobile/small screen widths.
+- No configuration, settings, env var, admin UI, database, or i18n mechanism is introduced for this text — it is hardcoded.
+- No prior/incorrect company name string ("Alpha Biscuits", "Beta Biscuit", or any other variant) remains anywhere in the layout/footer source.
 
 ## 2. File map
 
 | File | Change |
 |---|---|
-| Shared layout component containing the `<footer>` (e.g. `src/components/Layout.jsx` / equivalent shared layout/footer template — exact path to be confirmed by locating the existing `<footer>` usage in the repo) | Add a new element (e.g. `<p class="company-note">Alpha Biscuits</p>`) immediately before the existing `<footer>` element |
-| Stylesheet associated with the layout/footer (e.g. `src/components/Layout.css` / `src/styles/footer.css` or equivalent, matching whatever styling approach the footer already uses) | Add minimal styling class (small, muted text) for the new note, consistent with footer styling; ensure it wraps gracefully on small screens |
-| Existing layout/footer test file (e.g. `src/components/Layout.test.jsx` or equivalent, if a test file for the layout already exists) | Add/extend tests verifying the note renders above the footer and only where the footer is present |
-
-## 3. User journey
-
-A visitor loads any page of the site that uses the standard shared layout (e.g. the homepage or any content page with a footer). As they scroll to the bottom of the page, just before the footer content (links, copyright, etc.), they see a small, unobtrusive line of text reading "Alpha Biscuits", indicating the company that operates the site. On a page that intentionally does not render the shared footer (e.g. a standalone/print view, if one exists), no such note appears. Resizing the browser to a mobile width, the note remains readable, wraps if needed, and does not overlap or shift other footer content.
-
-## 4. Tasks
-
-- [ ] 1
+| src/components/Layout.tsx (or equivalent shared layout component) | Add a small text element containing "Delta Biscuit" immediately before the `<Footer />` / `<footer>` render, replacing any prior placeholder/company-name text if one already exists. |
+| src/components/Footer.tsx (or equivalent footer component, if the note lives inside it instead of the layout) | Add/adjust the note element and its minimal styling,
