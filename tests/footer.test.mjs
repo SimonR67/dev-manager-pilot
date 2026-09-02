@@ -26,6 +26,28 @@ test('every page renders the company note with the exact company name', () => {
   }
 })
 
+test('the company note is styled small and muted', () => {
+  for (const page of pages()) {
+    const rule = read(page).match(/\.company-note\s*\{([^}]*)\}/)
+    assert.ok(rule, `${page} should style .company-note`)
+    assert.match(rule[1], /font-size:/, 'note should set a smaller font size')
+    assert.match(rule[1], /color:/, 'note should set a muted colour')
+  }
+})
+
+test('existing page content and styles are left unchanged', () => {
+  for (const page of pages()) {
+    const markup = read(page)
+    assert.match(markup, /<h1>Dev Manager Pilot<\/h1>/)
+    assert.match(markup, /<p>Placeholder page\. Real features will replace this content once the pipeline is built\.<\/p>/)
+
+    // The note's own rule is the only styling this change introduces.
+    const styles = markup.match(/<style[^>]*>([\s\S]*?)<\/style>/)?.[1] ?? ''
+    const selectors = [...styles.matchAll(/([^{}]+)\{[^}]*\}/g)].map((match) => match[1].trim())
+    assert.deepEqual(selectors, ['.company-note'])
+  }
+})
+
 test('the company note sits immediately above the footer region', () => {
   for (const page of pages()) {
     const markup = body(read(page))
