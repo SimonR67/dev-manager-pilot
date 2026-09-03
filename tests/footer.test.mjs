@@ -77,6 +77,44 @@ test('the company note is styled small and muted', () => {
   }
 })
 
+test('the company note is spaced away from the content above it', () => {
+  for (const page of pages()) {
+    const rule = read(page).match(/\.company-note\s*\{([^}]*)\}/)
+    assert.ok(rule, `${page} should style .company-note`)
+    assert.match(rule[1], /margin/, 'note should set spacing above the footer region')
+  }
+})
+
+test('the company note stays in normal flow at mobile and desktop widths', () => {
+  // The page has no viewport-dependent styling, so a note that neither leaves
+  // normal flow nor fixes its own size cannot overlap or clip at any width --
+  // it wraps and stacks identically at 375px and at 1280px.
+  const unsafe = [
+    [/\bposition\s*:\s*(absolute|fixed)/, 'note should stay in normal flow'],
+    [/\b(width|height)\s*:\s*\d/, 'note should not fix its own size'],
+    [/\bfloat\s*:\s*(left|right)/, 'note should not float beside other content'],
+    [/\boverflow\s*:\s*hidden/, 'note should not clip its own text'],
+    [/\bwhite-space\s*:\s*nowrap/, 'note should be free to wrap on narrow screens'],
+  ]
+
+  for (const page of pages()) {
+    const markup = read(page)
+
+    const rule = markup.match(/\.company-note\s*\{([^}]*)\}/)
+    assert.ok(rule, `${page} should style .company-note`)
+    for (const [pattern, message] of unsafe) {
+      assert.doesNotMatch(rule[1], pattern, `${page}: ${message}`)
+    }
+
+    // No media queries means desktop and mobile share one set of declarations.
+    assert.equal(countMatches(markup, /@media\b/g), 0, `${page} note needs no breakpoint overrides`)
+
+    const note = body(markup).match(/<p[^>]*class="company-note"[^>]*>/)
+    assert.ok(note)
+    assert.doesNotMatch(note[0], /\bstyle=/, 'note should carry no inline sizing')
+  }
+})
+
 test('existing page content and styles are left unchanged', () => {
   for (const page of pages()) {
     const markup = read(page)
