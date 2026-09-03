@@ -28,7 +28,7 @@ test('every page renders the company note with the exact company name', () => {
   for (const page of pages()) {
     const note = body(read(page)).match(/<p[^>]*class="company-note"[^>]*>([\s\S]*?)<\/p>/)
     assert.ok(note, `${page} should render a company note`)
-    assert.equal(note[1].trim(), 'Sid Meyer Ressurection')
+    assert.equal(note[1].trim(), 'Quake World')
   }
 })
 
@@ -38,7 +38,7 @@ test('every page using the shared layout renders the note, exactly once', () => 
 
   for (const page of all) {
     assert.equal(
-      countMatches(read(page), /Sid Meyer Ressurection/g),
+      countMatches(read(page), /Quake World/g),
       1,
       `${page} should render the company note exactly once`,
     )
@@ -48,7 +48,7 @@ test('every page using the shared layout renders the note, exactly once', () => 
 test('a page without the shared layout does not render the note', () => {
   const standalone = readFileSync(path.join(fixtures, 'no-layout.html'), 'utf8')
 
-  assert.ok(!standalone.includes('Sid Meyer Ressurection'))
+  assert.ok(!standalone.includes('Quake World'))
   assert.equal(countMatches(body(standalone), /<footer\b/g), 0)
 })
 
