@@ -9,6 +9,60 @@ const HOME_PAGE = 'index.html'
 const STYLESHEET = 'styles.css'
 const TITLE = 'Minas Tirus'
 
+const HEX = /#[0-9a-f]{6}\b|#[0-9a-f]{3}\b/gi
+
+function rule(css, selector) {
+  const match = css.match(new RegExp(`${selector}\\s*\\{([^}]*)\\}`))
+  assert.ok(match, `the stylesheet should declare ${selector.replace(/\\/g, '')}`)
+  return match[1]
+}
+
+// `color` must not match the tail of `background-color`.
+function declared(block, property) {
+  const match = block.match(new RegExp(`(?<![-\\w])${property}:\\s*([^;]+)`))
+  assert.ok(match, `the rule should declare ${property}`)
+  return resolve(match[1])
+}
+
+// Resolves `var(--name)` against the :root block, so tests read the shade the
+// browser would actually paint rather than the variable name.
+function resolve(value) {
+  const name = value.trim().match(/^var\((--[\w-]+)\)$/)
+  if (!name) return value.trim()
+  return rule(read(STYLESHEET), ':root').match(new RegExp(`${name[1]}:\\s*([^;]+)`))[1].trim()
+}
+
+function channels(hex) {
+  const digits = hex.trim().replace('#', '')
+  assert.match(digits, /^([0-9a-f]{3}|[0-9a-f]{6})$/i, `${hex} should be a hex colour`)
+
+  const parts = digits.length === 3 ? [...digits].map((digit) => digit + digit) : digits.match(/../g)
+  return parts.map((part) => parseInt(part, 16))
+}
+
+// Black, orange, or a near-grey neutral -- anything else is off-scheme.
+function family(hex) {
+  const [r, g, b] = channels(hex)
+  const [max, min] = [Math.max(r, g, b), Math.min(r, g, b)]
+
+  if (max - min <= 20) return max <= 40 ? 'black' : 'neutral'
+
+  const hue = 60 * (((g - b) / (max - min)) % 6)
+  return max === r && hue >= 15 && hue <= 45 ? 'orange' : `off-scheme (hue ${hue.toFixed(0)})`
+}
+
+function luminance(hex) {
+  const [r, g, b] = channels(hex)
+    .map((value) => value / 255)
+    .map((value) => (value <= 0.03928 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4))
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b
+}
+
+function contrast(foreground, background) {
+  const [light, dark] = [luminance(foreground), luminance(background)].sort((a, b) => b - a)
+  return (light + 0.05) / (dark + 0.05)
+}
+
 function section(markup, tag) {
   const match = markup.match(new RegExp(`<${tag}\\b[\\s\\S]*?</${tag}>`))
   assert.ok(match, `the page should render a <${tag}>`)
@@ -121,6 +175,54 @@ test('the hero title is the largest text on the page', () => {
   const titleSize = Number(titleRule[1].match(/font-size:[^;]*?([\d.]+)rem/)?.[1])
   assert.ok(titleSize > 0, 'the hero title should set a font size in rem')
   assert.equal(titleSize, Math.max(...sizes), 'no other rule should set a larger font size')
+})
+
+// Acceptance criterion 6: the colour scheme is black and orange throughout,
+// with a light neutral used only where text would otherwise be hard to read.
+test('every colour the site declares is black, orange or a neutral', () => {
+  const declared = [...`${read(STYLESHEET)}${read(HOME_PAGE)}`.matchAll(HEX)].map((m) => m[0])
+  assert.ok(declared.length > 0, 'the site should declare colours')
+
+  for (const colour of declared) {
+    assert.ok(
+      ['black', 'orange', 'neutral'].includes(family(colour)),
+      `${colour} is outside the black and orange scheme`,
+    )
+  }
+})
+
+test('the page, nav and hero all draw on the scheme', () => {
+  const css = read(STYLESHEET)
+
+  assert.equal(family(declared(rule(css, 'body'), 'background-color')), 'black')
+  assert.equal(family(declared(rule(css, '\\.site-nav__brand'), 'color')), 'orange')
+  assert.equal(family(declared(rule(css, '\\.hero__title'), 'color')), 'orange')
+})
+
+test('text on the page stays legible against its background', () => {
+  const css = read(STYLESHEET)
+  const page = declared(rule(css, 'body'), 'background-color')
+  const heroBackground = declared(rule(css, '\\.hero'), 'background-color')
+  const cta = rule(css, '\\.hero__cta')
+
+  // Orange on black and black on orange both risk washing out, so check the
+  // pairs the page actually renders rather than trusting the shades by eye.
+  const pairs = [
+    ['body text', declared(rule(css, 'body'), 'color'), page],
+    ['nav brand', declared(rule(css, '\\.site-nav__brand'), 'color'), page],
+    ['nav links', declared(rule(css, '\\.site-nav__links a'), 'color'), page],
+    ['hero title', declared(rule(css, '\\.hero__title'), 'color'), heroBackground],
+    ['hero tagline', declared(rule(css, '\\.hero__tagline'), 'color'), heroBackground],
+    ['hero button', declared(cta, 'color'), declared(cta, 'background-color')],
+    ['company note', declared(rule(read(HOME_PAGE), '\\.company-note'), 'color'), page],
+  ]
+
+  for (const [name, foreground, background] of pairs) {
+    assert.ok(
+      contrast(foreground, background) >= 4.5,
+      `${name} (${foreground} on ${background}) should reach 4.5:1, got ${contrast(foreground, background).toFixed(2)}`,
+    )
+  }
 })
 
 test('the hero title wraps rather than overflowing', () => {
