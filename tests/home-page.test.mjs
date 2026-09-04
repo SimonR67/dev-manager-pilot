@@ -269,6 +269,19 @@ test('nothing on the page is pinned to a width that would overflow a phone', () 
   assert.match(css, /max-width:/, 'wide viewports should be constrained by a max-width')
 })
 
+test('page content is constrained so wide viewports do not look sparse', () => {
+  const css = read(STYLESHEET)
+
+  // The nav and hero already cap themselves; the body copy below them has to
+  // share that measure or it stretches edge to edge on a wide monitor.
+  for (const selector of ['\\.site-nav', '\\.hero__inner', '\\.page']) {
+    assert.match(rule(css, selector), /max-width:/, `${selector} should cap its measure`)
+    assert.match(rule(css, selector), /margin:[^;]*auto/, `${selector} should centre itself`)
+  }
+
+  assert.match(body(read(HOME_PAGE)), /<main[^>]*class="[^"]*page/, 'body copy should sit in .page')
+})
+
 test('the nav bar stacks rather than overflowing on narrow screens', () => {
   const navRule = rule(read(STYLESHEET), '\\.site-nav')
 

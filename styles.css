@@ -25,6 +25,15 @@ body {
   padding: 0 1.25rem;
 }
 
+.page {
+  max-width: 68rem;
+  margin: 3rem auto;
+}
+
+.page h1 {
+  color: var(--orange);
+}
+
 /* Navigation bar
    ------------------------------------------------------------------ */
 
