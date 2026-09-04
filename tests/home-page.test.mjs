@@ -27,3 +27,18 @@ test('the home page is a complete HTML5 document', () => {
 test('the home page is titled after the site', () => {
   assert.match(read(HOME_PAGE), new RegExp(`<title>[^<]*${TITLE}[^<]*</title>`))
 })
+
+// Acceptance criterion 2: a separate CSS file is linked and used, with no
+// inline-only styling for major layout.
+test('the home page links a separate stylesheet', () => {
+  assert.match(
+    read(HOME_PAGE),
+    new RegExp(`<link[^>]*rel="stylesheet"[^>]*href="${STYLESHEET}"`),
+    `the page should link ${STYLESHEET}`,
+  )
+  assert.ok(read(STYLESHEET).trim().length > 0, `${STYLESHEET} should not be empty`)
+})
+
+test('no element on the home page carries inline styling', () => {
+  assert.equal(countMatches(body(read(HOME_PAGE)), /\sstyle="/g), 0)
+})

@@ -1,0 +1,26 @@
+/* Minas Tirus -- black and orange colour scheme.
+   Plain CSS, no build step: index.html links this file directly. */
+
+:root {
+  --black: #000000;
+  --black-raised: #121212;
+  --orange: #ff7a18;
+  --orange-deep: #c85a0a;
+  /* Light neutral, used only where orange-on-black would be too dim to read. */
+  --paper: #f5f0e8;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background-color: var(--black);
+  color: var(--paper);
+  font-family: "Trebuchet MS", "Segoe UI", Helvetica, Arial, sans-serif;
+  line-height: 1.6;
+  padding: 0 1.25rem;
+}
