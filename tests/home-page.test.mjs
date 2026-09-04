@@ -1,7 +1,12 @@
 import assert from 'node:assert/strict'
+import { existsSync } from 'node:fs'
+import path from 'node:path'
 import { test } from 'node:test'
+import { fileURLToPath } from 'node:url'
 
 import { body, countMatches, pages, read } from './helpers/pages.mjs'
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 
 // The site is served as static files from the repo root, so index.html is the
 // document a browser loads at / -- the home page this spec describes.
@@ -268,4 +273,41 @@ test('the nav bar stacks rather than overflowing on narrow screens', () => {
   const navRule = rule(read(STYLESHEET), '\\.site-nav')
 
   assert.match(navRule, /flex-wrap:\s*wrap/, 'nav items should wrap instead of overflowing')
+})
+
+// Acceptance criterion 8: opening index.html in a browser works as-is, with no
+// framework or build tool in the way.
+test('the page pulls in no framework, bundle or third-party asset', () => {
+  const markup = read(HOME_PAGE)
+
+  assert.equal(countMatches(markup, /<script\b/g), 0, 'the page should need no JavaScript')
+  assert.doesNotMatch(markup, /https?:\/\//, 'the page should load nothing off-origin')
+  assert.doesNotMatch(read(STYLESHEET), /@import|https?:\/\//, 'the stylesheet should stand alone')
+})
+
+test('the page needs no build step to open', () => {
+  const scripts = JSON.parse(read('package.json')).scripts ?? {}
+
+  assert.ok(!('build' in scripts), 'a build script would mean the source is not what the browser loads')
+  assert.deepEqual(JSON.parse(read('package.json')).dependencies ?? {}, {})
+})
+
+// Acceptance criterion 9: the page is free of console errors in a modern
+// browser -- which, for a static page, means every reference it makes resolves.
+test('every asset the page references exists in the repo', () => {
+  const markup = read(HOME_PAGE)
+
+  const references = [...markup.matchAll(/(?:href|src)="([^"#][^"]*)"/g)].map((match) => match[1])
+  assert.ok(references.length > 0, 'the page should reference at least the stylesheet')
+
+  for (const reference of references) {
+    assert.ok(existsSync(path.join(root, reference)), `${reference} is referenced but missing`)
+  }
+})
+
+test('the page renders content without relying on JavaScript', () => {
+  const markup = body(read(HOME_PAGE))
+
+  assert.ok(markup.includes(TITLE), 'the title should be in the served markup, not injected')
+  assert.doesNotMatch(markup, /\son[a-z]+="/, 'no element should carry an inline event handler')
 })
