@@ -1,0 +1,158 @@
+/* Minas Tirus -- black and orange colour scheme.
+   Plain CSS, no build step: index.html links this file directly. */
+
+:root {
+  --black: #000000;
+  --black-raised: #121212;
+  --orange: #ff7a18;
+  --orange-deep: #c85a0a;
+  /* Light neutral, used only where orange-on-black would be too dim to read. */
+  --paper: #f5f0e8;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background-color: var(--black);
+  color: var(--paper);
+  font-family: "Trebuchet MS", "Segoe UI", Helvetica, Arial, sans-serif;
+  line-height: 1.6;
+  padding: 0 1.25rem;
+}
+
+.page {
+  max-width: 68rem;
+  margin: 3rem auto;
+}
+
+.page h1 {
+  color: var(--orange);
+}
+
+/* Navigation bar
+   ------------------------------------------------------------------ */
+
+.site-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 2rem;
+  max-width: 68rem;
+  margin: 0 auto;
+  padding: 1rem 0;
+  border-bottom: 2px solid var(--orange);
+}
+
+.site-nav__brand {
+  color: var(--orange);
+  font-size: 1.25rem;
+  font-weight: bold;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.site-nav__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site-nav__links a {
+  color: var(--paper);
+  text-decoration: none;
+  padding: 0.25rem 0;
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.site-nav__links a:hover,
+.site-nav__links a:focus {
+  color: var(--orange);
+  border-bottom-color: var(--orange);
+}
+
+/* Hero
+   ------------------------------------------------------------------ */
+
+.hero {
+  background-color: var(--black-raised);
+  border-bottom: 1px solid var(--orange-deep);
+  margin: 0 -1.25rem;
+  padding: 4.5rem 1.25rem;
+}
+
+.hero__inner {
+  max-width: 68rem;
+  margin: 0 auto;
+}
+
+.hero__title {
+  margin: 0;
+  color: var(--orange);
+  font-size: 4rem;
+  line-height: 1.1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.hero__tagline {
+  margin: 1rem 0 0;
+  max-width: 34rem;
+  color: var(--paper);
+  font-size: 1.25rem;
+}
+
+.hero__cta {
+  display: inline-block;
+  margin-top: 2rem;
+  padding: 0.75rem 1.75rem;
+  background-color: var(--orange);
+  color: var(--black);
+  font-weight: bold;
+  text-decoration: none;
+  border: 2px solid var(--orange);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.hero__cta:hover,
+.hero__cta:focus {
+  background-color: transparent;
+  color: var(--orange);
+}
+
+/* Narrow viewports
+   ------------------------------------------------------------------ */
+
+@media (max-width: 40rem) {
+  .site-nav {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .hero {
+    padding: 3rem 1.25rem;
+  }
+
+  .hero__title {
+    font-size: 2.5rem;
+  }
+
+  .hero__tagline {
+    font-size: 1.0625rem;
+  }
+
+  .hero__cta {
+    display: block;
+    text-align: center;
+  }
+}
