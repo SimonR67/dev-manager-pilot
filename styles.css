@@ -71,3 +71,52 @@ body {
   color: var(--orange);
   border-bottom-color: var(--orange);
 }
+
+/* Hero
+   ------------------------------------------------------------------ */
+
+.hero {
+  background-color: var(--black-raised);
+  border-bottom: 1px solid var(--orange-deep);
+  margin: 0 -1.25rem;
+  padding: 4.5rem 1.25rem;
+}
+
+.hero__inner {
+  max-width: 68rem;
+  margin: 0 auto;
+}
+
+.hero__title {
+  margin: 0;
+  color: var(--orange);
+  font-size: 4rem;
+  line-height: 1.1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.hero__tagline {
+  margin: 1rem 0 0;
+  max-width: 34rem;
+  color: var(--paper);
+  font-size: 1.25rem;
+}
+
+.hero__cta {
+  display: inline-block;
+  margin-top: 2rem;
+  padding: 0.75rem 1.75rem;
+  background-color: var(--orange);
+  color: var(--black);
+  font-weight: bold;
+  text-decoration: none;
+  border: 2px solid var(--orange);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.hero__cta:hover,
+.hero__cta:focus {
+  background-color: transparent;
+  color: var(--orange);
+}

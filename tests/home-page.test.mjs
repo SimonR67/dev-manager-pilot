@@ -16,6 +16,7 @@ function section(markup, tag) {
 }
 
 const nav = (markup) => section(markup, 'nav')
+const hero = (markup) => section(markup, 'header')
 
 // Acceptance criterion 1: index.html renders a complete, valid HTML5 page.
 test('the home page is a complete HTML5 document', () => {
@@ -87,4 +88,45 @@ test('the navigation bar is styled by the shared stylesheet', () => {
 
   assert.match(css, /\.site-nav\b/, 'the stylesheet should style the nav bar')
   assert.match(body(read(HOME_PAGE)), /<nav[^>]*class="[^"]*site-nav/, 'the nav should use that class')
+})
+
+// Acceptance criterion 4: a hero section sits directly below the nav bar.
+test('the hero section sits directly below the navigation bar', () => {
+  const markup = body(read(HOME_PAGE))
+
+  const navBlock = nav(markup)
+  const after = markup.slice(markup.indexOf(navBlock) + navBlock.length)
+
+  assert.match(after.trimStart(), /^<header[^>]*class="[^"]*hero/, 'the hero should follow the nav')
+  assert.equal(countMatches(markup, /class="[^"]*\bhero\b/g), 1, 'there should be one hero')
+})
+
+// Acceptance criterion 5: the hero prominently displays "Minas Tirus" as its
+// dominant heading element.
+test('the hero displays the site title as its heading', () => {
+  const heroBlock = hero(body(read(HOME_PAGE)))
+
+  const heading = heroBlock.match(/<h1[^>]*>([\s\S]*?)<\/h1>/)
+  assert.ok(heading, 'the hero should carry an h1')
+  assert.equal(heading[1].trim(), TITLE, 'the hero heading should read exactly "Minas Tirus"')
+})
+
+test('the hero title is the largest text on the page', () => {
+  const css = read(STYLESHEET)
+
+  const sizes = [...css.matchAll(/font-size:\s*([\d.]+)rem/g)].map((match) => Number(match[1]))
+  const titleRule = css.match(/\.hero__title\s*\{([^}]*)\}/)
+  assert.ok(titleRule, 'the stylesheet should style .hero__title')
+
+  const titleSize = Number(titleRule[1].match(/font-size:[^;]*?([\d.]+)rem/)?.[1])
+  assert.ok(titleSize > 0, 'the hero title should set a font size in rem')
+  assert.equal(titleSize, Math.max(...sizes), 'no other rule should set a larger font size')
+})
+
+test('the hero title wraps rather than overflowing', () => {
+  const titleRule = read(STYLESHEET).match(/\.hero__title\s*\{([^}]*)\}/)[1]
+
+  assert.doesNotMatch(titleRule, /white-space\s*:\s*nowrap/, 'a long title should be free to wrap')
+  assert.doesNotMatch(titleRule, /overflow\s*:\s*hidden/, 'a long title should not be clipped')
+  assert.doesNotMatch(titleRule, /\bwidth\s*:\s*\d/, 'the title should not fix its own width')
 })
