@@ -232,3 +232,40 @@ test('the hero title wraps rather than overflowing', () => {
   assert.doesNotMatch(titleRule, /overflow\s*:\s*hidden/, 'a long title should not be clipped')
   assert.doesNotMatch(titleRule, /\bwidth\s*:\s*\d/, 'the title should not fix its own width')
 })
+
+// Acceptance criterion 7: the page renders without breaking at common desktop
+// and mobile widths.
+test('the page opts into the device viewport', () => {
+  assert.match(
+    read(HOME_PAGE),
+    /<meta[^>]*name="viewport"[^>]*content="[^"]*width=device-width/,
+    'without a viewport meta, mobile browsers render the page zoomed out',
+  )
+})
+
+test('the layout adapts at a mobile breakpoint', () => {
+  const css = read(STYLESHEET)
+
+  assert.ok(countMatches(css, /@media\b/g) >= 1, 'the stylesheet should carry a breakpoint')
+  assert.match(css, /@media[^{]*max-width/, 'the breakpoint should target narrow viewports')
+})
+
+test('nothing on the page is pinned to a width that would overflow a phone', () => {
+  const css = read(STYLESHEET)
+
+  // A 375px-wide phone is ~23.4rem. Any fixed width or min-width above that
+  // forces a horizontal scrollbar; max-width caps are what keep wide screens
+  // from looking sparse, so those are the only sizing rules allowed.
+  for (const [, property, size, unit] of css.matchAll(/(?<![-\w])(min-width|width):\s*([\d.]+)(rem|px)\s*;/g)) {
+    const rem = unit === 'px' ? Number(size) / 16 : Number(size)
+    assert.ok(rem <= 23.4, `${property}: ${size}${unit} would overflow a 375px viewport`)
+  }
+
+  assert.match(css, /max-width:/, 'wide viewports should be constrained by a max-width')
+})
+
+test('the nav bar stacks rather than overflowing on narrow screens', () => {
+  const navRule = rule(read(STYLESHEET), '\\.site-nav')
+
+  assert.match(navRule, /flex-wrap:\s*wrap/, 'nav items should wrap instead of overflowing')
+})

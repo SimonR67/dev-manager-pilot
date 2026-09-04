@@ -120,3 +120,30 @@ body {
   background-color: transparent;
   color: var(--orange);
 }
+
+/* Narrow viewports
+   ------------------------------------------------------------------ */
+
+@media (max-width: 40rem) {
+  .site-nav {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .hero {
+    padding: 3rem 1.25rem;
+  }
+
+  .hero__title {
+    font-size: 2.5rem;
+  }
+
+  .hero__tagline {
+    font-size: 1.0625rem;
+  }
+
+  .hero__cta {
+    display: block;
+    text-align: center;
+  }
+}
