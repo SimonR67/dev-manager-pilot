@@ -150,3 +150,15 @@ test('the hero comes before the service detail', () => {
   const markup = file(PAGE)
   assert.ok(markup.indexOf('sp-services-hero') < markup.indexOf('<h2'), 'hero first, then services')
 })
+
+// Task 5: a fourth offering, structured exactly like the first three so the
+// shared checks above still apply to it.
+test('the page lists four to five services', () => {
+  const count = services().length
+  assert.ok(count >= 4 && count <= 5, `expected 4 or 5 services, got ${count}`)
+})
+
+test('staff augmentation is one of the offerings', () => {
+  const titles = services().map((service) => service.match(/<h2\b[^>]*>([\s\S]*?)<\/h2>/)[1].trim())
+  assert.ok(titles.includes('Staff Augmentation'), `expected Staff Augmentation among ${titles}`)
+})
