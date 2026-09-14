@@ -208,3 +208,51 @@ test('the call to action is set apart by extra spacing', () => {
   const largest = Math.max(...[...declarations.matchAll(/(\d+(?:\.\d+)?)rem/g)].map((m) => Number(m[1])))
   assert.ok(largest >= 4, `the CTA should be spaced more generously than body sections, got ${largest}rem`)
 })
+
+// Task 7: the footer closes the page with who we are and where else to go.
+const FOOTER_GROUPS = ['Services', 'Work', 'About', 'Careers']
+
+test('the page renders exactly one footer', () => {
+  const markup = file(PAGE)
+  assert.equal((markup.match(/<footer\b/g) ?? []).length, 1)
+  assert.ok(markup.indexOf('<footer') > markup.indexOf(cta(markup)), 'the footer should come last')
+})
+
+test('the footer opens with a company blurb', () => {
+  const blurb = region(file(PAGE), 'footer').match(/<p\b[^>]*sp-services-footer-blurb[^>]*>([\s\S]*?)<\/p>/)
+  assert.ok(blurb, 'the footer should render a company blurb')
+  assert.ok(blurb[1].trim().length > 40, 'the blurb should say who we are')
+})
+
+test('the footer groups its links under the four expected headings', () => {
+  const footer = region(file(PAGE), 'footer')
+  const groups = [...footer.matchAll(/<nav\b[^>]*sp-services-footer-group[\s\S]*?<\/nav>/g)].map((m) => m[0])
+
+  assert.deepEqual(
+    groups.map((group) => group.match(/<h2\b[^>]*>([\s\S]*?)<\/h2>/)[1].trim()),
+    FOOTER_GROUPS,
+  )
+  for (const group of groups) {
+    assert.ok(links(group).length >= 1, 'each group should list at least one link')
+  }
+})
+
+test('the footer gives a placeholder contact email and a website link', () => {
+  const footer = links(region(file(PAGE), 'footer'))
+
+  const email = footer.find((link) => link.href?.startsWith('mailto:'))
+  assert.ok(email, 'the footer should offer a contact email')
+  assert.match(email.href, /@example\.com$/, 'the email should be a placeholder')
+
+  const site = footer.find((link) => /^https?:\/\//.test(link.href ?? ''))
+  assert.ok(site, 'the footer should link the website')
+})
+
+test('the footer carries Privacy and Terms placeholders', () => {
+  const footer = links(region(file(PAGE), 'footer'))
+  for (const label of ['Privacy', 'Terms']) {
+    const link = footer.find((item) => item.text === label)
+    assert.ok(link, `the footer should link ${label}`)
+    assert.equal(link.href, '#', `${label} should stay a placeholder`)
+  }
+})
