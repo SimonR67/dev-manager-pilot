@@ -386,3 +386,50 @@ test('nothing in the sheet can force sideways scrolling on a phone', () => {
     assert.ok(px <= 320, `a min-width of ${size}${unit} would overflow a phone viewport`)
   }
 })
+
+// Task 11: were this sheet ever included on another page, it must change
+// nothing there -- so every selector is anchored to a page-scoped class.
+const SCOPE = 'sp-services-'
+
+function selectors() {
+  return [...file(STYLESHEET).replace(/\/\*[\s\S]*?\*\//g, '').matchAll(/([^{}]+)\{[^{}]*\}/g)]
+    .flatMap((match) => match[1].split(','))
+    .map((selector) => selector.trim())
+    .filter((selector) => selector.length > 0 && !selector.startsWith('@'))
+}
+
+test('every rule in the sheet is anchored to a page-scoped class', () => {
+  for (const selector of selectors()) {
+    assert.match(
+      selector.split(/\s|>/)[0],
+      new RegExp(`^\\.${SCOPE}`),
+      `"${selector}" would leak outside services.html`,
+    )
+  }
+})
+
+test('the sheet overrides no bare element or global selector', () => {
+  for (const selector of selectors()) {
+    assert.doesNotMatch(
+      selector,
+      /^(html|body|:root|\*|h[1-6]|p|a|ul|li|nav|header|footer|section|div)\b/,
+      `"${selector}" is a global override`,
+    )
+  }
+})
+
+test('the page names no class outside its own scope', () => {
+  const classes = [...file(PAGE).matchAll(/class="([^"]*)"/g)]
+    .flatMap((match) => match[1].split(/\s+/))
+    .filter(Boolean)
+
+  assert.ok(classes.length > 0, 'the page should use classes for styling')
+  for (const name of classes) {
+    assert.ok(name.startsWith(SCOPE), `class "${name}" is outside the page scope`)
+  }
+})
+
+test('the page carries no inline styles or style block of its own', () => {
+  assert.doesNotMatch(file(PAGE), /\bstyle=/, 'styling belongs in services.css')
+  assert.doesNotMatch(file(PAGE), /<style\b/, 'styling belongs in services.css')
+})
