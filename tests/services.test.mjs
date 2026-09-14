@@ -331,3 +331,58 @@ test('hover states are reachable by keyboard too', () => {
     )
   }
 })
+
+// Task 10: at phone width the page becomes one column and the nav wraps, with
+// nothing wide enough to force a sideways scroll.
+function mediaBlock(maxWidth) {
+  const css = file(STYLESHEET)
+  const start = css.search(new RegExp(`@media[^{]*max-width\\s*:\\s*${maxWidth}px`))
+  if (start < 0) return undefined
+
+  // A media block closes at the brace that balances its own opening one.
+  let depth = 0
+  for (let i = css.indexOf('{', start); i < css.length; i += 1) {
+    if (css[i] === '{') depth += 1
+    if (css[i] === '}' && (depth -= 1) === 0) return css.slice(css.indexOf('{', start) + 1, i)
+  }
+  return undefined
+}
+
+test('the page has a phone and a tablet breakpoint', () => {
+  assert.ok(mediaBlock(480), 'the sheet should have a <=480px breakpoint')
+
+  const tablet = [...file(STYLESHEET).matchAll(/@media[^{]*max-width\s*:\s*(\d+)px/g)]
+    .map((match) => Number(match[1]))
+    .filter((width) => width > 480 && width <= 1024)
+  assert.ok(tablet.length >= 1, 'the sheet should also have a tablet breakpoint')
+})
+
+test('services stack into a single column on a phone', () => {
+  const phone = mediaBlock(480)
+  const list = phone.match(/\.sp-services-list[^{]*\{([^}]*)\}/)
+  assert.ok(list, 'the phone breakpoint should relayout the service list')
+  assert.match(list[1], /grid-template-columns\s*:\s*(1fr|minmax\(0,\s*1fr\))\s*;/, 'one column only')
+})
+
+test('the nav stacks or wraps on a phone', () => {
+  const phone = mediaBlock(480)
+  const nav = phone.match(/\.sp-services-nav\b[^{]*\{([^}]*)\}/)
+  assert.ok(nav, 'the phone breakpoint should relayout the nav')
+  assert.match(nav[1], /flex-direction\s*:\s*column|flex-wrap\s*:\s*wrap|display\s*:\s*(flex|grid)/)
+})
+
+test('nothing in the sheet can force sideways scrolling on a phone', () => {
+  const css = file(STYLESHEET)
+
+  assert.doesNotMatch(css, /white-space\s*:\s*nowrap/, 'text should be free to wrap')
+  // (?<![-\w]) so max-width and min-width declarations are not mistaken for a
+  // fixed width.
+  assert.doesNotMatch(css, /(?<![-\w])width\s*:\s*\d+vw/, 'no viewport-width boxes')
+  assert.doesNotMatch(css, /(?<![-\w])width\s*:\s*\d{3,}px/, 'no fixed wide boxes')
+
+  // Any floor on a box has to fit inside a 480px viewport, padding included.
+  for (const [, size, unit] of css.matchAll(/min-width\s*:\s*(\d+(?:\.\d+)?)(rem|px)/g)) {
+    const px = unit === 'rem' ? Number(size) * 16 : Number(size)
+    assert.ok(px <= 320, `a min-width of ${size}${unit} would overflow a phone viewport`)
+  }
+})
