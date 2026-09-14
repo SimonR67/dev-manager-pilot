@@ -113,3 +113,40 @@ test('the hero pairs the heading with a tagline', () => {
   assert.ok(tagline[1].trim().length > 20, 'the tagline should say something')
   assert.ok(hero.indexOf('<h1') < tagline.index, 'the tagline should follow the heading')
 })
+
+// Task 4: each service explains itself the same way -- what it is, how it is
+// done, and who it is for -- so the list is scannable.
+const SUB_LABELS = ['Technologies/Methodologies', 'Target Audience']
+
+function services(html = file(PAGE)) {
+  return [...html.matchAll(/<section\b[^>]*sp-services-service[\s\S]*?<\/section>/g)].map((m) => m[0])
+}
+
+test('the page lists at least three services', () => {
+  assert.ok(services().length >= 3, `expected 3 or more services, got ${services().length}`)
+})
+
+test('every service has one title, a description, and both sub-blocks', () => {
+  for (const service of services()) {
+    const title = [...service.matchAll(/<h2\b[^>]*>([\s\S]*?)<\/h2>/g)]
+    assert.equal(title.length, 1, 'a service should have exactly one h2 title')
+    assert.ok(title[0][1].trim().length > 0, 'the title should not be empty')
+
+    const description = service.match(/<p\b[^>]*>([\s\S]*?)<\/p>/)
+    assert.ok(description, `${title[0][1]} should have a description paragraph`)
+    assert.ok(description[1].trim().length > 40, `${title[0][1]}'s description should say something`)
+
+    const subs = [...service.matchAll(/<h3\b[^>]*>([\s\S]*?)<\/h3>/g)].map((m) => m[1].trim())
+    assert.deepEqual(subs, SUB_LABELS, `${title[0][1]} should label both sub-blocks`)
+  }
+})
+
+test('the services have distinct titles', () => {
+  const titles = services().map((service) => service.match(/<h2\b[^>]*>([\s\S]*?)<\/h2>/)[1].trim())
+  assert.equal(new Set(titles).size, titles.length, 'each service should be a distinct offering')
+})
+
+test('the hero comes before the service detail', () => {
+  const markup = file(PAGE)
+  assert.ok(markup.indexOf('sp-services-hero') < markup.indexOf('<h2'), 'hero first, then services')
+})
