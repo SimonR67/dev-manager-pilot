@@ -1,2 +1,42 @@
 /* Styles for services.html only. Every selector is scoped to the
    .sp-services-page prefix so this sheet cannot leak into other pages. */
+
+/* Header: stays in view so the nav is reachable anywhere in the service list. */
+.sp-services-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #ffffff;
+  border-bottom: 1px solid #ececec;
+}
+
+.sp-services-header-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+  max-width: 68rem;
+  margin: 0 auto;
+  padding: 1rem 1.5rem;
+}
+
+.sp-services-logo {
+  color: #111111;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+}
+
+.sp-services-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+}
+
+.sp-services-nav-link {
+  color: #333333;
+  font-size: 0.9375rem;
+  text-decoration: none;
+}
