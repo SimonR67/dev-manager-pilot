@@ -4,10 +4,16 @@ import { fileURLToPath } from 'node:url'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..')
 
-// Every page of the site shares the same layout: a single HTML file at the repo
-// root. Discovering them means new pages are covered by the layout tests too.
+// Pages of the shared layout are single HTML files at the repo root.
+// Discovering them means new pages are covered by the layout tests too. A page
+// that brings its own markup and stylesheet opts out by declaring itself
+// standalone, so the layout checks stay about the layout.
+const STANDALONE = /<html[^>]*\bdata-layout="standalone"/
+
 export function pages() {
-  return readdirSync(root).filter((file) => file.endsWith('.html'))
+  return readdirSync(root)
+    .filter((file) => file.endsWith('.html'))
+    .filter((file) => !STANDALONE.test(read(file)))
 }
 
 export function read(page) {
