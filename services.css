@@ -1,0 +1,302 @@
+/* Styles for services.html only. Every selector is scoped to the
+   .sp-services-page prefix so this sheet cannot leak into other pages. */
+
+.sp-services-page {
+  margin: 0;
+  background: #ffffff;
+  color: #111111;
+  font-family: system-ui, -apple-system, "Segoe UI", "Open Sans", "Roboto", Arial, sans-serif;
+  font-size: 17px;
+  line-height: 1.65;
+}
+
+.sp-services-main {
+  max-width: 68rem;
+  margin: 0 auto;
+}
+
+/* Header: stays in view so the nav is reachable anywhere in the service list. */
+.sp-services-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #ffffff;
+  border-bottom: 1px solid #ececec;
+}
+
+.sp-services-header-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+  max-width: 68rem;
+  margin: 0 auto;
+  padding: 1rem 1.5rem;
+}
+
+.sp-services-logo {
+  color: #111111;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+}
+
+.sp-services-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+}
+
+.sp-services-nav-link {
+  color: #333333;
+  font-size: 0.9375rem;
+  text-decoration: none;
+}
+
+/* Hero: the page's one h1, with a coral rule marking the accent colour. */
+.sp-services-hero {
+  padding: 4.5rem 1.5rem 3rem;
+}
+
+.sp-services-hero h1 {
+  margin: 0 0 1.25rem;
+  font-size: 2.75rem;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.sp-services-hero h1::after {
+  display: block;
+  width: 4rem;
+  height: 4px;
+  margin-top: 1.25rem;
+  background: #FF6F61;
+  content: "";
+}
+
+.sp-services-tagline {
+  max-width: 38rem;
+  margin: 0;
+  color: #444444;
+  font-size: 1.1875rem;
+}
+
+/* Service list: two columns where there is room, one where there is not. */
+.sp-services-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2rem;
+  padding: 1rem 1.5rem 2rem;
+}
+
+.sp-services-service {
+  padding: 2rem;
+  border: 1px solid #ececec;
+  border-radius: 0.75rem;
+}
+
+.sp-services-service h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1.5rem;
+  letter-spacing: -0.01em;
+}
+
+.sp-services-service h3 {
+  margin: 1.5rem 0 0.375rem;
+  color: #FF6F61;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.sp-services-service p {
+  margin: 0;
+  color: #444444;
+}
+
+/* Call to action: set apart from the service list by its own tinted band and
+   noticeably more breathing room than a service section gets. */
+.sp-services-cta {
+  margin: 5rem 0 0;
+  padding: 5rem 1.5rem;
+  background: #fdf5f4;
+  border-top: 1px solid #f6dcd9;
+  text-align: center;
+}
+
+.sp-services-cta h2 {
+  margin: 0 0 1rem;
+  font-size: 1.875rem;
+}
+
+.sp-services-cta p {
+  max-width: 34rem;
+  margin: 0 auto 2.5rem;
+  color: #444444;
+}
+
+.sp-services-cta-button {
+  display: inline-block;
+  padding: 0.875rem 2.25rem;
+  background: #FF6F61;
+  border-radius: 2rem;
+  color: #ffffff;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* Footer: the closing block of orientation links. */
+.sp-services-footer {
+  padding: 3.5rem 1.5rem 2rem;
+  border-top: 1px solid #ececec;
+  color: #444444;
+  font-size: 0.9375rem;
+}
+
+.sp-services-footer-inner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2.5rem;
+  justify-content: space-between;
+  max-width: 68rem;
+  margin: 0 auto;
+}
+
+.sp-services-footer-about {
+  flex: 1 1 18rem;
+}
+
+.sp-services-footer-blurb {
+  max-width: 24rem;
+  margin: 0 0 1rem;
+}
+
+.sp-services-footer-contact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.25rem;
+  margin: 0;
+}
+
+.sp-services-footer-groups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+
+.sp-services-footer-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  min-width: 8rem;
+}
+
+.sp-services-footer-heading {
+  margin: 0 0 0.25rem;
+  color: #111111;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.sp-services-footer-link {
+  color: #444444;
+  text-decoration: none;
+}
+
+.sp-services-footer-legal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.25rem;
+  max-width: 68rem;
+  margin: 2.5rem auto 0;
+  padding-top: 1.5rem;
+  border-top: 1px solid #ececec;
+}
+
+/* Hover and keyboard focus share one treatment, so a pointer and a Tab key
+   get the same feedback. */
+.sp-services-logo:hover,
+.sp-services-logo:focus-visible {
+  color: #FF6F61;
+}
+
+.sp-services-nav-link:hover,
+.sp-services-nav-link:focus-visible {
+  color: #FF6F61;
+  text-decoration: underline;
+}
+
+.sp-services-cta-button:hover,
+.sp-services-cta-button:focus-visible {
+  background: #e85c4f;
+}
+
+.sp-services-footer-link:hover,
+.sp-services-footer-link:focus-visible {
+  color: #FF6F61;
+  text-decoration: underline;
+}
+
+/* Tablet: one column of services, since two would squeeze the copy. */
+@media (max-width: 900px) {
+  .sp-services-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sp-services-hero h1 {
+    font-size: 2.25rem;
+  }
+}
+
+/* Phone: everything stacks, and the nav becomes a wrapped row of its own line
+   under the logo rather than competing with it for width. */
+@media (max-width: 480px) {
+  .sp-services-header-inner {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0.875rem 1.125rem;
+  }
+
+  .sp-services-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem 1rem;
+  }
+
+  .sp-services-hero {
+    padding: 2.5rem 1.125rem 2rem;
+  }
+
+  .sp-services-hero h1 {
+    font-size: 1.875rem;
+  }
+
+  .sp-services-list {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.25rem;
+    padding: 0.5rem 1.125rem 1.5rem;
+  }
+
+  .sp-services-service {
+    padding: 1.5rem 1.25rem;
+  }
+
+  .sp-services-cta {
+    margin-top: 3rem;
+    padding: 3rem 1.125rem;
+  }
+
+  .sp-services-footer {
+    padding: 2.5rem 1.125rem 1.5rem;
+  }
+
+  .sp-services-footer-groups {
+    gap: 1.5rem;
+  }
+}
