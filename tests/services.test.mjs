@@ -256,3 +256,45 @@ test('the footer carries Privacy and Terms placeholders', () => {
     assert.equal(link.href, '#', `${label} should stay a placeholder`)
   }
 })
+
+// Task 8: the page's visual base -- white ground, dark text, coral accent, and
+// a font stack that degrades to the system sans-serif.
+test('the page sets a white background and dark text', () => {
+  const declarations = rule('.sp-services-page') ?? ''
+  assert.match(declarations, /background\s*:\s*(#fff(fff)?|white)\b/i)
+
+  const color = declarations.match(/(?:^|;)\s*color\s*:\s*(#[0-9a-f]{3,6})/i)
+  assert.ok(color, 'the page should set a text colour')
+
+  // Dark text: every channel of the hex sits in the bottom third of the range.
+  const hex = color[1].slice(1)
+  const full = hex.length === 3 ? [...hex].map((c) => c + c).join('') : hex
+  const channels = full.match(/../g).map((pair) => parseInt(pair, 16))
+  assert.ok(Math.max(...channels) <= 85, `text should be dark, got ${color[1]}`)
+})
+
+test('the page falls back to a system sans-serif font', () => {
+  const stack = (rule('.sp-services-page') ?? '').match(/font-family\s*:\s*([^;]+)/)
+  assert.ok(stack, 'the page should set a font stack')
+  assert.match(stack[1], /system-ui/, 'the stack should start from the system UI font')
+  assert.match(stack[1].trim(), /sans-serif\s*$/, 'the stack should end in the generic sans-serif')
+})
+
+test('the page uses no external font or asset source', () => {
+  assert.doesNotMatch(file(PAGE), /<link[^>]*href="https?:/i, 'no remote stylesheets or fonts')
+  assert.doesNotMatch(file(STYLESHEET), /@import|url\(\s*['"]?https?:/i, 'no remote CSS imports')
+})
+
+test('the coral accent is used beyond the contact button', () => {
+  const accented = [...file(STYLESHEET).matchAll(/([^{}]+)\{([^}]*)\}/g)]
+    .filter(([, , declarations]) => new RegExp(CORAL, 'i').test(declarations))
+    .map(([, selector]) => selector.trim())
+
+  assert.ok(accented.length >= 2, `coral should be the page accent, used in ${accented.length} rule(s)`)
+})
+
+test('the hero and each service section are spaced from their neighbours', () => {
+  for (const selector of ['.sp-services-hero', '.sp-services-service']) {
+    assert.match(rule(selector) ?? '', /\b(padding|margin)/, `${selector} should set its own spacing`)
+  }
+})
