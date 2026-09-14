@@ -95,3 +95,21 @@ test('the nav links are placeholders, since those pages do not exist yet', () =>
     assert.match(item.href, /^#/, `${item.text} should point at a placeholder anchor`)
   }
 })
+
+// Task 3: the hero states what the page is about before any service detail.
+test('the hero heading names the page, and is the only h1', () => {
+  const headings = [...file(PAGE).matchAll(/<h1\b[^>]*>([\s\S]*?)<\/h1>/g)]
+  assert.equal(headings.length, 1, 'the page should have exactly one h1')
+  assert.equal(headings[0][1].trim(), 'Softpapaya Services')
+})
+
+test('the hero pairs the heading with a tagline', () => {
+  const hero = file(PAGE).match(/<section\b[^>]*sp-services-hero[\s\S]*?<\/section>/)?.[0]
+  assert.ok(hero, 'the page should render a hero section')
+  assert.match(hero, /<h1\b/, 'the hero should hold the heading')
+
+  const tagline = hero.match(/<p\b[^>]*sp-services-tagline[^>]*>([\s\S]*?)<\/p>/)
+  assert.ok(tagline, 'the hero should render a tagline paragraph')
+  assert.ok(tagline[1].trim().length > 20, 'the tagline should say something')
+  assert.ok(hero.indexOf('<h1') < tagline.index, 'the tagline should follow the heading')
+})
