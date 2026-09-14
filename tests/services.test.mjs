@@ -162,3 +162,49 @@ test('staff augmentation is one of the offerings', () => {
   const titles = services().map((service) => service.match(/<h2\b[^>]*>([\s\S]*?)<\/h2>/)[1].trim())
   assert.ok(titles.includes('Staff Augmentation'), `expected Staff Augmentation among ${titles}`)
 })
+
+// Task 6: after reading the offerings, the visitor is invited to get in touch
+// from a section that stands apart from the list.
+const CORAL = '#FF6F61'
+
+function cta(html = file(PAGE)) {
+  return html.match(/<section\b[^>]*sp-services-cta\b[\s\S]*?<\/section>/)?.[0]
+}
+
+test('the call to action follows the last service', () => {
+  const markup = file(PAGE)
+  assert.ok(cta(markup), 'the page should render a call-to-action section')
+
+  const last = services(markup).at(-1)
+  assert.ok(markup.indexOf(cta(markup)) > markup.indexOf(last) , 'the CTA should come after the services')
+})
+
+test('the call to action has a heading and invitation copy', () => {
+  const section = cta()
+  assert.match(section, /<h2\b[^>]*>[\s\S]*?<\/h2>/, 'the CTA should have a heading')
+
+  const copy = section.match(/<p\b[^>]*>([\s\S]*?)<\/p>/)
+  assert.ok(copy, 'the CTA should invite the visitor to get in touch')
+  assert.ok(copy[1].trim().length > 30, 'the invitation should say something')
+})
+
+test('the call to action offers a static Contact link, with no form', () => {
+  const button = links(cta()).find((link) => /sp-services-cta-button/.test(link.tag))
+  assert.ok(button, 'the CTA should render a contact button')
+  assert.equal(button.text, 'Contact')
+  assert.match(button.href, /^(mailto:|#)/, 'the button should be a static link')
+  assert.doesNotMatch(file(PAGE), /<form\b/, 'the page should have no form to submit')
+})
+
+test('the contact button is coral', () => {
+  assert.match(rule('.sp-services-cta-button') ?? '', new RegExp(CORAL, 'i'))
+})
+
+test('the call to action is set apart by extra spacing', () => {
+  const declarations = rule('.sp-services-cta') ?? ''
+  const spacing = declarations.match(/\b(?:padding|margin)[^:]*:\s*([^;]+)/)
+  assert.ok(spacing, 'the CTA should set its own padding or margin')
+
+  const largest = Math.max(...[...declarations.matchAll(/(\d+(?:\.\d+)?)rem/g)].map((m) => Number(m[1])))
+  assert.ok(largest >= 4, `the CTA should be spaced more generously than body sections, got ${largest}rem`)
+})

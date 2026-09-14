@@ -40,3 +40,35 @@
   font-size: 0.9375rem;
   text-decoration: none;
 }
+
+/* Call to action: set apart from the service list by its own tinted band and
+   noticeably more breathing room than a service section gets. */
+.sp-services-cta {
+  margin: 5rem 0 0;
+  padding: 5rem 1.5rem;
+  background: #fdf5f4;
+  border-top: 1px solid #f6dcd9;
+  text-align: center;
+}
+
+.sp-services-cta h2 {
+  margin: 0 0 1rem;
+  font-size: 1.875rem;
+}
+
+.sp-services-cta p {
+  max-width: 34rem;
+  margin: 0 auto 2.5rem;
+  color: #444444;
+}
+
+.sp-services-cta-button {
+  display: inline-block;
+  padding: 0.875rem 2.25rem;
+  background: #FF6F61;
+  border-radius: 2rem;
+  color: #ffffff;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  text-decoration: none;
+}
