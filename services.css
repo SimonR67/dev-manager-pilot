@@ -218,3 +218,27 @@
   padding-top: 1.5rem;
   border-top: 1px solid #ececec;
 }
+
+/* Hover and keyboard focus share one treatment, so a pointer and a Tab key
+   get the same feedback. */
+.sp-services-logo:hover,
+.sp-services-logo:focus-visible {
+  color: #FF6F61;
+}
+
+.sp-services-nav-link:hover,
+.sp-services-nav-link:focus-visible {
+  color: #FF6F61;
+  text-decoration: underline;
+}
+
+.sp-services-cta-button:hover,
+.sp-services-cta-button:focus-visible {
+  background: #e85c4f;
+}
+
+.sp-services-footer-link:hover,
+.sp-services-footer-link:focus-visible {
+  color: #FF6F61;
+  text-decoration: underline;
+}

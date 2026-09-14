@@ -298,3 +298,36 @@ test('the hero and each service section are spaced from their neighbours', () =>
     assert.match(rule(selector) ?? '', /\b(padding|margin)/, `${selector} should set its own spacing`)
   }
 })
+
+// Task 9: every interactive element answers the pointer.
+const INTERACTIVE = [
+  '.sp-services-logo',
+  '.sp-services-nav-link',
+  '.sp-services-cta-button',
+  '.sp-services-footer-link',
+]
+
+test('every interactive element has a hover state', () => {
+  const css = file(STYLESHEET)
+
+  for (const selector of INTERACTIVE) {
+    const hover = css.match(new RegExp(`\\${selector}:hover[^{]*\\{([^}]*)\\}`))
+    assert.ok(hover, `${selector} should have a :hover rule`)
+    assert.match(
+      hover[1],
+      /\b(color|background|text-decoration|border-bottom)\b/,
+      `${selector}:hover should change colour or underline`,
+    )
+  }
+})
+
+test('hover states are reachable by keyboard too', () => {
+  const css = file(STYLESHEET)
+  for (const selector of INTERACTIVE) {
+    assert.match(
+      css,
+      new RegExp(`\\${selector}:hover\\s*,\\s*\\${selector}:focus-visible`),
+      `${selector} should apply the same treatment on keyboard focus`,
+    )
+  }
+})
